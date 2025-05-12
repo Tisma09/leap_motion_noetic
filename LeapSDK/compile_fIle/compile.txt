@@ -1,0 +1,18 @@
+___________________________________________________
+
+Compile instrcution for python lib generation
+___________________________________________________
+
+Swig version : SWIG Version 4.0.1
+Python version : Python 3.8.10
+
+cd /path/to/LeapSDK/include
+swig -python -py3 -c++ -o LeapPython.cpp -interface LeapPython Leap.i
+
+g++ -std=c++11 -fPIC -shared \
+  -I/usr/include/python3.8 \
+  -I../include \
+  LeapPython.cpp -o LeapPython.so \
+  -L../lib/ -lLeap
+
+Use clean.py and correct errors

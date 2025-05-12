@@ -87,8 +87,7 @@ include_directories(
 )
 
 # If you want to use this on a 32-bit machine, here's the place to change
-set(LIB_LEAP ${PROJECT_SOURCE_DIR}/LeapSDK/lib/x64/libLeap.so)
-#set(LIB_LEAP ${PROJECT_SOURCE_DIR}/LeapSDK/lib/x86/libLeap.so)
+set(LIB_LEAP ${PROJECT_SOURCE_DIR}/LeapSDK/lib/libLeap.so)
 
 ## Declare a C++ library
 add_library(lmc_listener 

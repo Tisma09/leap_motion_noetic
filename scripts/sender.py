@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-
-""" For backwards compatibility with the old driver files
-                Will be DELETED in the future               """
+#!/usr/bin/env python3
 
 __author__ = 'flier'
 
