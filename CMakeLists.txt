@@ -69,8 +69,6 @@ catkin_package(
   roscpp
   std_msgs
   visualization_msgs
-
-  # For backwards compatibility with the old driver files
   rospy
 )
 
@@ -83,98 +81,14 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/LeapSDK/include/
 )
-
-# If you want to use this on a 32-bit machine, here's the place to change
-set(LIB_LEAP ${PROJECT_SOURCE_DIR}/LeapSDK/lib/libLeap.so)
 
 ## Declare a C++ library
-add_library(lmc_listener 
-  src/lmc_listener.cpp
-)
-add_dependencies(lmc_listener 
-  ${PROJECT_NAME}_gencpp
-)
-target_link_libraries(lmc_listener
-  ${catkin_LIBRARIES}
-  ${PROJECT_SOURCE_DIR}/LeapSDK/include/Leap.h
-)
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 
-# The executable node that talks to the Leap Motion controller
-add_executable( ${PROJECT_NAME}_driver_node 
-  src/lmc_driver_node.cpp
-)
-add_dependencies( ${PROJECT_NAME}_driver_node
-  ${${PROJECT_NAME}_EXPORTED_TARGETS} 
-  ${catkin_EXPORTED_TARGETS}
-)
-target_link_libraries(${PROJECT_NAME}_driver_node
-  ${catkin_LIBRARIES}
-  lmc_listener
-  ${LIB_LEAP}
-)
-
-# Node that visualizes the data it gets from the controller
-add_executable(${PROJECT_NAME}_visualizer_node 
-  src/lmc_visualizer_node.cpp
-)
-
-add_dependencies(${PROJECT_NAME}_visualizer_node  
-  ${PROJECT_NAME}_gencpp
-)
-target_link_libraries(${PROJECT_NAME}_visualizer_node  
-  ${catkin_LIBRARIES}
-  ${LIB_LEAP}
-)
-
-# Node that publishes raw camera images. Be sure to 
-# have "Allow images" enabled in LeapControlPanel!
-add_executable(${PROJECT_NAME}_camera_node 
-  src/lmc_camera_node.cpp
-)
-target_link_libraries(${PROJECT_NAME}_camera_node
-  ${catkin_LIBRARIES} 
-  ${LIB_LEAP}
-)
-
-# Filter node implementing a 2nd-order Butterworth lowpass filter
-add_executable(${PROJECT_NAME}_filter_node 
-  src/lmc_filter_node.cpp
-)
-add_dependencies(${PROJECT_NAME}_filter_node 
-  ${${PROJECT_NAME}_EXPORTED_TARGETS} 
-  ${catkin_EXPORTED_TARGETS}
-)
-target_link_libraries(${PROJECT_NAME}_filter_node
-  ${catkin_LIBRARIES} 
-  ${LIB_LEAP}
-)
-
-#########################################################
-# For backwards compatibility with the old driver files #
-#                     DEPRECATED                        #
-#########################################################
-
-add_executable(leap_hands 
-  src/leap_hands.cpp
-)
-target_link_libraries(leap_hands
-  ${catkin_LIBRARIES} ${LIB_LEAP}
-)
-
-add_executable(leap_camera src/leap_camera.cpp)
-target_link_libraries(leap_camera
-  ${catkin_LIBRARIES} ${LIB_LEAP}
-)
-
-install(TARGETS leap_camera leap_hands
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
 
 install(PROGRAMS
   scripts/leap_interface.py scripts/sender.py scripts/subscriber.py

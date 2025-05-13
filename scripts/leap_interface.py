@@ -197,10 +197,20 @@ class LeapInterface(Leap.Listener):
                     print "Screen Tap id: %d, %s, position: %s, direction: %s" % (
                             gesture.id, self.state_string(gesture.state),
                             screentap.position, screentap.direction )
+            '''
+        else:
+            # No hands detected
+            self.hand = [0,0,0]
+            self.right_hand = False
+            self.left_hand = False
+            self.hand_direction = [0,0,0]
+            self.hand_normal    = [0,0,0]
+            self.hand_palm_pos  = [0,0,0]
+            self.hand_pitch     = 0.0
+            self.hand_yaw       = 0.0
+            self.hand_roll      = 0.0
 
-        if not (frame.hands.empty and frame.gestures().empty):
-            print ""
-
+    '''
     def state_string(self, state):
         if state == Leap.Gesture.STATE_START:
             return "STATE_START"

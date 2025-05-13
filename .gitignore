@@ -1,4 +1,4 @@
+sandbox/
 *.pyc
-# Ignore Visual Studio Code settings
-.vscode/*
+.vscode/
 

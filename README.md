@@ -2,45 +2,29 @@
 
 ROS driver for the Leap Motion Controller
 
-[![Build Status](https://travis-ci.org/ros-drivers/leap_motion.svg?branch=hydro)](https://travis-ci.org/ros-drivers/leap_motion)
-
 ## REQUIREMENTS
 
-You should have [ROS Kinetic](http://wiki.ros.org/kinetic) or a [newer version](http://wiki.ros.org/Distributions) installed on your device and the [Leap Motion SDK](https://developer.leapmotion.com/sdk/v2) for Linux.
+This code is valid only for [ROS Noetic](http://wiki.ros.org/noetic). For previous ROS distributions, please refer to the original repository: [https://github.com/ros-drivers/leap_motion](https://github.com/ros-drivers/leap_motion).
 
-## FEATURES
+On ROS Noetic, the `libLeap` package is not compatible with `rocpp`. Therefore, this package uses a Python wrapper that has been recompiled with SWIG to ensure compatibility with Python 3.
 
-Currently, this ROS package supports one person (left and right arm), publishing raw camera images from the controller, basic visualization using RViz and a pointcloud2 generated from [stereo_image_proc](http://wiki.ros.org/stereo_image_proc) node.
+You should also have the Leap Motion SDK for Linux installed on your device.
 
-There is also a filter node implementing a 2nd-order Butterworth lowpass filter that is used to filter the hand x, y, z coordinates coming from the Leap Controller via Human.msg. For more information refer to Julius O. Smith III, [Intro to Digital Filters with Audio Applications](https://ccrma.stanford.edu/~jos/filters/).
 
 ## INSTALLATION
 
 ### Python API installation
 
-**1.** If you wish to use the old deprecated Python API you need to append the location of your LeapSDK to your environment variables. This step differs depending on where you saved the SDK. The LeapSDK folder should contain the following [files](https://developer-archive.leapmotion.com/documentation/v2/python/devguide/Project_Setup.html): lib/Leap.py, lib/x86/LeapPython.so, lib/x86/libLeap.so, lib/x64/LeapPython.so, lib/x64/libLeap.so lib/LeapPython.so, lib/libLeap.dylib.
+The Python API is now mandatory for this package. It has been recompiled with SWIG to ensure compatibility with Python 3. You need to append the location of your LeapSDK to your environment variables. This step differs depending on where you saved the SDK. The LeapSDK folder should contain the following : `lib/Leap.py`, `lib/LeapPython.so`, `lib/libLeap.so`.
 
 Example:
 
 ```bash
 # 64-bit operating system
-export PYTHONPATH=$PYTHONPATH:$HOME/LeapSDK/lib:$HOME/LeapSDK/lib/x64
+export PYTHONPATH=$PYTHONPATH:$HOME/LeapSDK/lib:$HOME/LeapSDK/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/LeapSDK/lib:$HOME/LeapSDK/lib
 
-# 32-bit operating system
-export PYTHONPATH=$PYTHONPATH:$HOME/LeapSDK/lib:$HOME/LeapSDK/lib/x86
-```
 
-**2.** (OPTIONAL) You can edit your ~/.bashrc file to remove the need to export the location of your LeapSDK every time you open a new shell. Just append the LeapSDK location to the end of the PYTHONPATH.
-
-```bash
-# 64-bit operating system
-echo "export PYTHONPATH=$PYTHONPATH:$HOME/LeapSDK/lib:$HOME/LeapSDK/lib/x64" >> ~/.bashrc
-source ~/.bashrc
-
-# 32-bit operating system
-echo "export PYTHONPATH=$PYTHONPATH:$HOME/LeapSDK/lib:$HOME/LeapSDK/lib/x86" >> ~/.bashrc
-source ~/.bashrc
-```
 
 ### Usage
 
@@ -74,7 +58,7 @@ source ~/catkin_ws/devel/setup.bash
 **5.** Launch the demo.launch file to see if you have set everything up correctly. If you wish to enable a lowpass filter change "enable_filter" to true in filter_params.yaml file.
 
 ```bash
-roslaunch leap_motion demo.launch
+roslaunch leap_motion skeleton_visu.launch
 ```
 
 **6.** You are done! You should see an RViz window opening up displaying the detected hands from the controller.

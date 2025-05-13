@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
-
-__author__ = 'flier'
-
-import argparse
-
 import rospy
 import leap_interface
-from leap_motion.msg import leap
 from leap_motion.msg import leapros
 
 FREQUENCY_ROSTOPIC_DEFAULT = 0.01
@@ -23,7 +17,6 @@ def sender():
     li = leap_interface.Runner()
     li.setDaemon(True)
     li.start()
-    # pub     = rospy.Publisher('leapmotion/raw',leap)
     pub_ros   = rospy.Publisher('leapmotion/data',leapros, queue_size=2)
     rospy.init_node(NODENAME)
 
@@ -59,8 +52,6 @@ def sender():
                     setattr(getattr(msg, '%s_%s' % (fingerName, fingerPointName)),
                             dimName, pos[iDim])
 
-        # We don't publish native data types, see ROS best practices
-        # pub.publish(hand_direction=hand_direction_,hand_normal = hand_normal_, hand_palm_pos = hand_palm_pos_, hand_pitch = hand_pitch_, hand_roll = hand_roll_, hand_yaw = hand_yaw_)
         pub_ros.publish(msg)
         rospy.sleep(rospy.get_param(PARAMNAME_FREQ_ENTIRE, FREQUENCY_ROSTOPIC_DEFAULT))
 
