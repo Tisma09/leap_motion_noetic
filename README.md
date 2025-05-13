@@ -23,7 +23,7 @@ Example:
 # 64-bit operating system
 export PYTHONPATH=$PYTHONPATH:$HOME/LeapSDK/lib:$HOME/LeapSDK/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/LeapSDK/lib:$HOME/LeapSDK/lib
-
+```
 
 
 ### Usage
