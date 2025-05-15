@@ -1,79 +1,279 @@
 #!/usr/bin/env python3
 
-#################################################################################
-# Copyright (C) 2012-2013 Leap Motion, Inc. All rights reserved.                #
-# Leap Motion proprietary and confidential. Not for distribution.               #
-# Use subject to the terms of the Leap Motion SDK Agreement available at        #
-# https://developer.leapmotion.com/sdk_agreement, or another agreement          #
-# between Leap Motion and you, your company or other organization.              #
-#################################################################################
-
-#################################################################################
-# Altered LEAP example by Florian Lier, you need to have the LEAP SDK installed #
-# for this to work properly ;)                                                  #
-# This interface provides access to the LEAP MOTION hardware, you will need to  #
-# have the official LEAP MOTION SDK installed in order to load the shared       #
-# provided with the SDK.                                                        #
-#################################################################################
-
-import sys
-import time
 # Set (append) your PYTHONPATH properly, or just fill in the location of your LEAP
 # SDK folder, e.g., $HOME/LeapSDK/lib where the Leap.py lives and /LeapSDK/lib/x64 or
 # x86 where the *.so files reside.
 
-# Below, you can see the "dirty" version - NOT RECOMMENDED!
-
-# sys.path.append("/home/YOUR_NAME/path/to/Leap_Developer/LeapSDK/lib")
-# sys.path.append("/home/YOUR_NAME/path/to/Leap_Developer/Leap_Developer/LeapSDK/lib/x64")
 import threading
+import time
 import Leap
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 
+from leap_motion_noetic.msg import Frame, Finger, Bone, Hand, Arm, Gesture
+from geometry_msgs.msg import Vector3, Point
+
+
+
+
+class LeapBone():
+    def __init__(self):
+
+        # For Skeleton sender :
+        self.basis = Leap.Matrix()
+        self.prev_joint = Leap.Vector()
+
+        self.msg = Bone()
+        self.msg.type = 9
+        self.msg.length = 0.0
+        self.msg.width = 0.0
+        self.msg.bone_start = Point(0,0,0)
+        self.msg.bone_end = Point(0,0,0)
+        self.msg.center = Point(0,0,0)
+        self.msg.to_string = "Bone"
+                
+
+
+    def update(self, bone):
+
+        # For Skeleton sender :
+        self.basis = bone.basis
+        self.prev_joint = bone.prev_joint
+
+        self.msg.type = bone.type
+        self.msg.width = bone.width
+        self.msg.length = bone.length
+        self.msg.bone_start = Point(bone.prev_joint.x, bone.prev_joint.y, bone.prev_joint.z)
+        self.msg.bone_end = Point(bone.next_joint.x, bone.next_joint.y, bone.next_joint.z)
+        self.msg.center = Point(bone.center.x, bone.center.y, bone.center.z)
+
+
+
+
+
 class LeapFinger():
-    def __init__(self, finger=None):
-        self.boneNames = ['metacarpal',
-                          'proximal',
-                          'intermediate',
-                          'distal']
+    def __init__(self):
+        self.boneNames = ['metacarpal', 'proximal', 'intermediate', 'distal']
         for boneName in self.boneNames:
-            setattr(self, boneName, [0.0, 0.0, 0.0])
+            setattr(self, boneName, LeapBone())
         self.tip = [0.0, 0.0, 0.0]
 
-        self.leapBoneNames = [Leap.Bone.TYPE_METACARPAL,
-                              Leap.Bone.TYPE_PROXIMAL,
-                              Leap.Bone.TYPE_INTERMEDIATE,
-                              Leap.Bone.TYPE_DISTAL]
+        self.msg = Finger()
+        self.msg.lmc_finger_id = 9999
+        self.msg.type = 9
+        self.msg.length = 0.0
+        self.msg.width = 0.0
+        self.msg.to_string = "Finger"
 
-        if finger is not None:
-            self.importFinger(finger)
+        #self.msg.bone_list = [getattr(self, name).msg for name in self.boneNames]
+                
 
-    def importFinger(self, finger):
+
+    def update(self, finger):
         for boneName in self.boneNames:
             # Get the base of each bone
             bone = finger.bone(getattr(Leap.Bone, 'TYPE_%s' % boneName.upper()))
-            setattr(self, boneName, bone.prev_joint.to_float_array())
+            getattr(self, boneName).update(bone)
         # For the tip, get the end of the distal bone
         self.tip = finger.bone(Leap.Bone.TYPE_DISTAL).next_joint.to_float_array()
+
+
+        self.msg.lmc_finger_id = finger.id
+        self.msg.type = finger.type
+        self.msg.length = finger.length
+        self.msg.width = finger.width
+
+        #self.msg.bone_list = [getattr(self, name).msg for name in self.boneNames]
+
+
+
+
+
+
+
+
+
+
+
+class LeapHand():
+    def __init__(self):
+        self.fingerNames = ['thumb', 'index', 'middle', 'ring', 'pinky']
+        for fingerName in self.fingerNames:
+            setattr(self, fingerName, LeapFinger())
+
+        # For Skeleton sender :
+        self.basis = Leap.Matrix()
+        self.palm_position = Leap.Vector()
+
+        #self.arm = LeapArm()
+
+        self.msg = Hand()
+        self.msg.lmc_hand_id = 9999
+        self.msg.is_present = False
+        self.msg.time_visible = 0.0
+        self.msg.confidence = 0.0
+        self.msg.roll = 0.0
+        self.msg.pitch = 0.0
+        self.msg.yaw = 0.0
+        self.msg.direction = Vector3(0,0,0)
+        self.msg.normal = Vector3(0,0,0)
+        self.msg.grab_strength = 0.0
+        self.msg.pinch_strength = 0.0
+        self.msg.palm_velocity = Vector3(0,0,0)
+        self.msg.palm_center = Point(0,0,0)
+        self.msg.palm_width = 0.0
+        self.msg.sphere_radius = 0.0
+        self.msg.sphere_center = Point(0,0,0)
+        self.msg.to_string = "Hand"
+
+        #self.msg.finger_list = [getattr(self, name).msg for name in self.fingerNames]
+        #self.msg.arm = self.arm.msg
+
+
+
+    def update(self, hand):
+        if not hand.fingers.is_empty:
+            for fingerName in self.fingerNames:
+                finger = hand.fingers.finger_type(getattr(Leap.Finger, 'TYPE_%s' % fingerName.upper()))[0]
+                getattr(self, fingerName).update(finger)
+
+        # For Skeleton sender :
+        self.basis = hand.basis
+        self.palm_position = hand.palm_position
+
+        #self.arm.update(hand.arm)
+
+        self.msg.lmc_hand_id = hand.id
+        self.msg.is_present = True
+        self.msg.time_visible = hand.time_visible
+        self.msg.confidence = hand.confidence
+        self.msg.roll = hand.palm_normal.roll * Leap.RAD_TO_DEG
+        self.msg.pitch = hand.palm_normal.pitch * Leap.RAD_TO_DEG
+        self.msg.yaw = hand.palm_normal.yaw * Leap.RAD_TO_DEG
+        self.msg.direction = Vector3(hand.direction.x, hand.direction.y, hand.direction.z)
+        self.msg.normal = Vector3(hand.palm_normal.x, hand.palm_normal.y, hand.palm_normal.z)
+        self.msg.grab_strength = hand.grab_strength
+        self.msg.pinch_strength = hand.pinch_strength
+        self.msg.palm_velocity = Vector3(hand.palm_velocity.x, hand.palm_velocity.y, hand.palm_velocity.z)
+        self.msg.palm_center = Point(hand.palm_position.x, hand.palm_position.y, hand.palm_position.z)
+        self.msg.palm_width = hand.palm_width
+        self.msg.sphere_radius = hand.sphere_radius
+        self.msg.sphere_center = Point(hand.sphere_center.x, hand.sphere_center.y, hand.sphere_center.z)
+        
+        #self.msg.finger_list = [getattr(self, name).msg for name in self.fingerNames]
+        #self.msg.arm = self.arm.msg
+
+
+
+
+
+
+
+
+
+class LeapFrame():
+    def __init__(self):
+        self.right_hand = LeapHand()
+        self.left_hand = LeapHand()
+        self.gestures = None
+
+        self.msg = Frame()
+        self.msg.lmc_frame_id = 9999
+        self.msg.nr_of_fingers = 0
+        self.msg.nr_of_hands = 0
+        self.msg.nr_of_gestures = 0
+        self.msg.current_frames_per_second = 0.0
+        self.msg.to_string = "Frame"
+        #self.msg.right_hand = self.right_hand.msg
+        #self.msg.left_hand = self.right_hand.msg
+
+    def update(self, controller):
+        _frame = controller.frame() # Local Object
+        there_is_right_hand, there_is_left_hand = False, False
+        for hand in _frame.hands:
+            if hand.is_right:
+                there_is_right_hand=True
+                self.right_hand.update(hand)
+            elif hand.is_left:
+                there_is_left_hand=True
+                self.left_hand.update(hand)
+        
+        self.right_hand.msg.is_present = there_is_right_hand
+        self.left_hand.msg.is_present = there_is_left_hand
+        self.gestures = _frame.gestures()
+
+        self.msg.lmc_frame_id = _frame.id
+        self.msg.nr_of_fingers = len(_frame.fingers)
+        self.msg.nr_of_hands = len(_frame.hands)
+        self.msg.nr_of_gestures = len(_frame.gestures())
+        self.msg.current_frames_per_second = _frame.current_frames_per_second
+
+        #self.msg.right_hand = self.right_hand.msg
+        #self.msg.left_hand = self.right_hand.msg
+
+
+    def gesture_type(self, controller):
+        # Gestures
+        for gesture in self.gestures():
+            if gesture.type == Leap.Gesture.TYPE_CIRCLE:
+                circle = CircleGesture(gesture)
+
+                # Determine clock direction using the angle between the pointable and the circle normal
+                if circle.pointable.direction.angle_to(circle.normal) <= Leap.PI/4:
+                    clockwiseness = "clockwise"
+                else:
+                    clockwiseness = "counterclockwise"
+
+                # Calculate the angle swept since the last frame
+                swept_angle = 0
+                if circle.state != Leap.Gesture.STATE_START:
+                    previous_update = CircleGesture(controller.frame(1).gesture(circle.id))
+                    swept_angle =  (circle.progress - previous_update.progress) * 2 * Leap.PI
+
+                print("Circle id: %d, %s, progress: %f, radius: %f, angle: %f degrees, %s" % (
+                        gesture.id, self.state_string(gesture.state),
+                        circle.progress, circle.radius, swept_angle * Leap.RAD_TO_DEG, clockwiseness))
+
+            if gesture.type == Leap.Gesture.TYPE_SWIPE:
+                swipe = SwipeGesture(gesture)
+                print("Swipe id: %d, state: %s, position: %s, direction: %s, speed: %f" % (
+                        gesture.id, self.state_string(gesture.state),
+                        swipe.position, swipe.direction, swipe.speed))
+
+            if gesture.type == Leap.Gesture.TYPE_KEY_TAP:
+                keytap = KeyTapGesture(gesture)
+                print("Key Tap id: %d, %s, position: %s, direction: %s" % (
+                        gesture.id, self.state_string(gesture.state),
+                        keytap.position, keytap.direction ))
+
+            if gesture.type == Leap.Gesture.TYPE_SCREEN_TAP:
+                screentap = ScreenTapGesture(gesture)
+                print("Screen Tap id: %d, %s, position: %s, direction: %s" % (
+                        gesture.id, self.state_string(gesture.state),
+                        screentap.position, screentap.direction ))
+
+
+    def state_string(state):
+        if state == Leap.Gesture.STATE_START:
+            return "STATE_START"
+
+        if state == Leap.Gesture.STATE_UPDATE:
+            return "STATE_UPDATE"
+
+        if state == Leap.Gesture.STATE_STOP:
+            return "STATE_STOP"
+
+        if state == Leap.Gesture.STATE_INVALID:
+            return "STATE_INVALID"
+
+
+
+
 
 
 
 class LeapInterface(Leap.Listener):
     def on_init(self, controller):
-        # These variables as probably not thread safe
-        # TODO: Make thread safe ;)
-        self.hand           = [0,0,0]
-        self.right_hand = False
-        self.left_hand = False
-        self.hand_direction = [0,0,0]
-        self.hand_normal    = [0,0,0]
-        self.hand_palm_pos  = [0,0,0]
-        self.hand_pitch     = 0.0
-        self.hand_yaw       = 0.0
-        self.hand_roll      = 0.0
-        self.fingerNames = ['thumb', 'index', 'middle', 'ring', 'pinky']
-        for fingerName in self.fingerNames:
-            setattr(self, fingerName, LeapFinger())
+        self.frame = LeapFrame()
         print("Initialized Leap Motion Device")
 
     def on_connect(self, controller):
@@ -86,7 +286,6 @@ class LeapInterface(Leap.Listener):
         controller.enable_gesture(Leap.Gesture.TYPE_SWIPE);
 
     def on_disconnect(self, controller):
-        # Note: not dispatched when running in a debugger.
         print("Disconnected Leap Motion")
 
     def on_exit(self, controller):
@@ -94,157 +293,8 @@ class LeapInterface(Leap.Listener):
 
     def on_frame(self, controller):
         # Get the most recent frame and report some basic information
-        frame = controller.frame()
+        self.frame.update(controller)
 
-        print("Frame id: %d, timestamp: %d, hands: %d, fingers: %d, tools: %d, gestures: %d" % (
-              frame.id, frame.timestamp, len(frame.hands), len(frame.fingers), len(frame.tools), len(frame.gestures())))
-
-        if not frame.hands.is_empty: #recently changed in API
-            # Get the first hand
-
-
-            #we are seeking one left and one right hands
-            there_is_right_hand=False
-            there_is_left_hand=False
-
-            for hand in frame.hands:
-
-                if hand.is_right:
-                    there_is_right_hand=True
-                    self.right_hand=hand
-                elif hand.is_left:
-                    there_is_left_hand=True
-
-                    self.left_hand=hand
-
-            if not there_is_right_hand:
-                self.right_hand=False
-
-            if not there_is_left_hand:
-                self.left_hand=False
-
-            self.hand = frame.hands[0] #old way
-
-            # Check if the hand has any fingers
-            fingers = self.hand.fingers
-            if not fingers.is_empty:
-                for fingerName in self.fingerNames:
-                    #finger = fingers.finger_type(Leap.Finger.TYPE_THUMB)[0]
-                    #self.thumb.importFinger(finger)
-                    finger = fingers.finger_type(getattr(Leap.Finger, 'TYPE_%s' % fingerName.upper()))[0]
-                    getattr(self, fingerName).importFinger(finger)
-
-            # Get the hand's sphere radius and palm position
-            # print "Hand sphere radius: %f mm, palm position: %s" % (self.hand.sphere_radius, hand.palm_position)
-
-            # Get the hand's normal vector and direction
-            normal = self.hand.palm_normal
-            direction = self.hand.direction
-            pos = self.hand.palm_position
-
-            self.hand_direction[0] = direction.x
-            self.hand_direction[1] = direction.y
-            self.hand_direction[2] = direction.z
-            self.hand_normal[0]    = normal.x
-            self.hand_normal[1]    = normal.y
-            self.hand_normal[2]    = normal.z
-            self.hand_palm_pos[0]  = pos.x
-            self.hand_palm_pos[1]  = pos.y
-            self.hand_palm_pos[2]  = pos.z
-            self.hand_pitch        = direction.pitch * Leap.RAD_TO_DEG
-            self.hand_yaw          = normal.yaw * Leap.RAD_TO_DEG
-            self.hand_roll         = direction.roll * Leap.RAD_TO_DEG
-
-            # Calculate the hand's pitch, roll, and yaw angles
-            print("Hand pitch: %f degrees, roll: %f degrees, yaw: %f degrees" % (self.hand_pitch, self.hand_roll, self.hand_yaw))
-
-            '''
-            # Gestures
-            for gesture in frame.gestures():
-                if gesture.type == Leap.Gesture.TYPE_CIRCLE:
-                    circle = CircleGesture(gesture)
-
-                    # Determine clock direction using the angle between the pointable and the circle normal
-                    if circle.pointable.direction.angle_to(circle.normal) <= Leap.PI/4:
-                        clockwiseness = "clockwise"
-                    else:
-                        clockwiseness = "counterclockwise"
-
-                    # Calculate the angle swept since the last frame
-                    swept_angle = 0
-                    if circle.state != Leap.Gesture.STATE_START:
-                        previous_update = CircleGesture(controller.frame(1).gesture(circle.id))
-                        swept_angle =  (circle.progress - previous_update.progress) * 2 * Leap.PI
-
-                    print "Circle id: %d, %s, progress: %f, radius: %f, angle: %f degrees, %s" % (
-                            gesture.id, self.state_string(gesture.state),
-                            circle.progress, circle.radius, swept_angle * Leap.RAD_TO_DEG, clockwiseness)
-
-                if gesture.type == Leap.Gesture.TYPE_SWIPE:
-                    swipe = SwipeGesture(gesture)
-                    print "Swipe id: %d, state: %s, position: %s, direction: %s, speed: %f" % (
-                            gesture.id, self.state_string(gesture.state),
-                            swipe.position, swipe.direction, swipe.speed)
-
-                if gesture.type == Leap.Gesture.TYPE_KEY_TAP:
-                    keytap = KeyTapGesture(gesture)
-                    print "Key Tap id: %d, %s, position: %s, direction: %s" % (
-                            gesture.id, self.state_string(gesture.state),
-                            keytap.position, keytap.direction )
-
-                if gesture.type == Leap.Gesture.TYPE_SCREEN_TAP:
-                    screentap = ScreenTapGesture(gesture)
-                    print "Screen Tap id: %d, %s, position: %s, direction: %s" % (
-                            gesture.id, self.state_string(gesture.state),
-                            screentap.position, screentap.direction )
-            '''
-        else:
-            # No hands detected
-            self.hand = [0,0,0]
-            self.right_hand = False
-            self.left_hand = False
-            self.hand_direction = [0,0,0]
-            self.hand_normal    = [0,0,0]
-            self.hand_palm_pos  = [0,0,0]
-            self.hand_pitch     = 0.0
-            self.hand_yaw       = 0.0
-            self.hand_roll      = 0.0
-
-    '''
-    def state_string(self, state):
-        if state == Leap.Gesture.STATE_START:
-            return "STATE_START"
-
-        if state == Leap.Gesture.STATE_UPDATE:
-            return "STATE_UPDATE"
-
-        if state == Leap.Gesture.STATE_STOP:
-            return "STATE_STOP"
-
-        if state == Leap.Gesture.STATE_INVALID:
-            return "STATE_INVALID"
-    '''
-
-    def get_hand_direction(self):
-        return self.hand_direction
-
-    def get_hand_normal(self):
-        return self.hand_normal
-
-    def get_hand_palmpos(self):
-        return self.hand_palm_pos
-
-    def get_hand_yaw(self):
-        return self.hand_yaw
-
-    def get_hand_pitch(self):
-        return self.hand_pitch
-
-    def get_hand_roll(self):
-        return self.hand_roll
-
-    def get_finger_point(self, fingerName, fingerPointName):
-        return getattr(getattr(self, fingerName), fingerPointName)
 
 
 class Runner(threading.Thread):
@@ -258,27 +308,6 @@ class Runner(threading.Thread):
 
     def __del__(self):
         self.controller.remove_listener(self.listener)
-
-    def get_hand_direction(self):
-        return self.listener.get_hand_direction()
-
-    def get_hand_normal(self):
-        return self.listener.get_hand_normal()
-
-    def get_hand_palmpos(self):
-        return self.listener.get_hand_palmpos()
-
-    def get_hand_roll(self):
-        return self.listener.get_hand_roll()
-
-    def get_hand_pitch(self):
-        return self.listener.get_hand_pitch()
-
-    def get_hand_yaw(self):
-        return self.listener.get_hand_yaw()
-
-    def get_finger_point(self, fingerName, fingerPointName):
-        return self.listener.get_finger_point(fingerName, fingerPointName)
 
     def run (self):
         while True:

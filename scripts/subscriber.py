@@ -1,28 +1,34 @@
 #!/usr/bin/env python3
-
-__author__ = 'flier'
-
 import rospy
-from leap_motion.msg import leap
-from leap_motion.msg import leapros
-
-# Native datatypes, I've heard this is bad practice, use the geometry messages instead.
-# def callback(data):
-#    rospy.loginfo(rospy.get_name() + ": Leap Raw Data %s" % data)
+from leap_motion_noetic.msg import Frame, Finger, Bone, Hand, Arm, Gesture
+from geometry_msgs.msg import Vector3, Point
 
 
-# Callback of the ROS subscriber, just print the received data.
-def callback_ros(data):
-    rospy.loginfo(rospy.get_name() + ": Leap ROS Data %s" % data)
+
+class Subscriber:
+    def __init__(self):
+        # Initialize the ROS node
+        rospy.init_node('leap_sub', anonymous=True)
+
+        # Subscriber
+        self.sub_right_hand = rospy.Subscriber('leapmotion/right_hand', Hand, self.callback_hand)
 
 
-# Yes, a listener aka subscriber ;) obviously. Listens to: leapmotion/data
-def listener():
-    rospy.init_node('leap_sub', anonymous=True)
-    # rospy.Subscriber("leapmotion/raw", leap, callback)
-    rospy.Subscriber("leapmotion/data", leapros, callback_ros)
+
+    # Callback function for the subscriber
+    def callback_hand(self, data):
+        position = data.palm_center
+        rospy.loginfo(rospy.get_name() + ": Leap ROS Position %s" % position)
+
+
+
+
+def main():
+    listener = Subscriber()
     rospy.spin()
 
 
 if __name__ == '__main__':
-    listener()
+    main()
+
+    

@@ -1,12 +1,12 @@
 <launch>
     <!-- Start skeleton sender-->
-    <node pkg="leap_motion" 
+    <node pkg="leap_motion_noetic" 
         type="skeleton_sender.py" 
         name="skeleton_sender" 
         output="screen" 
-        launch-prefix="bash -c 'LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find leap_motion)/LeapSDK/lib PYTHONPATH=$PYTHONPATH:$(find leap_motion)/LeapSDK/lib exec python3 $(find leap_motion)/scripts/skeleton_sender.py'"/>
+        launch-prefix="bash -c 'LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find leap_motion_noetic)/LeapSDK/lib PYTHONPATH=$PYTHONPATH:$(find leap_motion_noetic)/LeapSDK/lib exec python3 $(find leap_motion_noetic)/scripts/skeleton_sender.py'"/>
 
     <!-- Open a preconfigured RViz window -->
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find leap_motion)/config/RViz/leap_skeleton_visu.rviz" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find leap_motion_noetic)/config/RViz/leap_skeleton_visu.rviz" />
 
 </launch>

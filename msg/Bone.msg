@@ -13,10 +13,10 @@ float32 width
 string to_string
 
 # The base of the bone, closest to the wrist. 
-geometry_msgs/Pose bone_start
+geometry_msgs/Point bone_start
 
 # The end of the bone, closest to the finger tip. 
-geometry_msgs/Pose bone_end
+geometry_msgs/Point bone_end
 
 # The midpoint of the bone. 
-float32[] center
+geometry_msgs/Point center

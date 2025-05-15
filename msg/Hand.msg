@@ -35,7 +35,7 @@ float32 grab_strength
 float32 pinch_strength
 
 # The rate of change of the palm position in meters/second. 
-float32[] palm_velocity
+geometry_msgs/Vector3 palm_velocity
 
 # The center position of the palm in meters from the Leap Motion Controller origin. 
 geometry_msgs/Point palm_center
@@ -47,14 +47,13 @@ float32 palm_width
 float32 sphere_radius
 
 # The center of a sphere fit to the curvature of this hand. 
-float32[] sphere_center
+geometry_msgs/Point sphere_center
 
 # A string containing a brief, human readable description of the Hand object. 
 string to_string 
 
 # A list of fingers and gestures associated with this hand
-Finger[] finger_list
-Gesture[] gesture_list
+#Finger[] finger_list
 
 # The arm associated with this hand
-Arm arm
+#Arm arm

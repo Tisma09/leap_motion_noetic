@@ -16,4 +16,4 @@ float32 width
 string to_string
 
 # List of bones associated with this finger
-Bone[] bone_list
+#Bone[] bone_list

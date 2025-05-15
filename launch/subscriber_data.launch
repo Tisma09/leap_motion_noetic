@@ -1,0 +1,7 @@
+<launch>
+    <!-- Start subscriber -->
+    <node pkg="leap_motion_noetic" 
+        type="subscriber.py" 
+        name="subscriber"
+        output="screen" />
+</launch>

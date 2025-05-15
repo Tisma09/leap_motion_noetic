@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(leap_motion)
+project(leap_motion_noetic)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
@@ -12,19 +12,14 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  camera_info_manager
-  camera_calibration_parsers 
-  geometry_msgs
+  #camera_info_manager
+  #camera_calibration_parsers 
   message_generation
+  geometry_msgs
   visualization_msgs
-
-  # For backwards compatibility with the old driver files
-  roslib
+  std_msgs
   rospy
-  sensor_msgs
 )
-
-find_package(OpenMP)
 
 
 ################################################
@@ -37,13 +32,9 @@ add_message_files(
   Arm.msg
   Bone.msg
   Finger.msg
+  Frame.msg
   Gesture.msg
   Hand.msg
-  Human.msg
-
-  # For backwards compatibility with the old driver files
-  leap.msg
-  leapros.msg
 )
 
 ## Generate added messages and services with any dependencies listed here
@@ -64,11 +55,10 @@ generate_messages(
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   CATKIN_DEPENDS
-  geometry_msgs
   message_runtime
-  roscpp
-  std_msgs
+  geometry_msgs
   visualization_msgs
+  std_msgs
   rospy
 )
 
@@ -90,10 +80,15 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 
 
+#############
+## Install ##
+#############
+
 install(PROGRAMS
-  scripts/leap_interface.py scripts/sender.py scripts/subscriber.py
+  scripts/leap_interface.py scripts/sender.py scripts/subscriber.py scripts/skeleton_sender.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
 install(DIRECTORY
   launch
   config/camera_info

@@ -17,10 +17,10 @@ bones_names=["metacarpal","proximal","intermediate","distal"]
 hand_ground_tf=PyKDL.Frame(PyKDL.Rotation.EulerZYX(0, 0, math.pi/2.0),PyKDL.Vector(0,0,0))
 
 
-def make_kdl_frame(leap_basis_matrix,leap_position_vector,is_left=False):
+def make_kdl_frame(leap_basis_matrix,leap_position_vector,marker_ns):
     # Makes kdl frame from Leap Motion matrix and vector formats
     
-    if is_left:
+    if marker_ns=="left_hand":
        basis=([-el for el in leap_basis_matrix.x_basis.to_float_array()]+
        leap_basis_matrix.y_basis.to_float_array()+
        leap_basis_matrix.z_basis.to_float_array())
@@ -72,35 +72,42 @@ def create_marker(frame, marker_id, marker_ns, marker_type, scale, color, parent
 def make_tf_marker_dict(hand, hand_name, marker_ns):
     
     hand_dict={}
-    hand_dict["hand_ground"]=["ground",hand_ground_tf]
+    hand_ground_name = hand_name + "_ground"
+    hand_dict[hand_ground_name]=["ground",hand_ground_tf]
     marker_array = MarkerArray()
     
             
-    hand_tf=make_kdl_frame(hand.basis,hand.palm_position,hand.is_left)
-    hand_dict[hand_name]=["hand_ground",hand_tf]
+    hand_tf=make_kdl_frame(hand.basis,hand.palm_position,marker_ns)
+    hand_dict[hand_name]=[hand_ground_name,hand_tf]
     id_bones=0
-    for finger in hand.fingers:
-        finger_name=hand_name+"_"+finger_names[finger.type]
+    fingerNames = ['thumb', 'index', 'middle', 'ring', 'pinky']
+    for fingerName in fingerNames:
+        finger = getattr(hand, fingerName)
+        if finger.msg.lmc_finger_id == 9999 :
+            continue
+        finger_name=hand_name+"_"+fingerName
         
         prev_bone_name=hand_name
-        for num in range(0,4):
-            
-            bone=finger.bone(num)
+        boneNames = ['metacarpal', 'proximal', 'intermediate', 'distal']
+        for boneName in boneNames:
+            bone = getattr(finger, boneName)
+            if bone.msg.type == 9 :
+                continue
 
-            bone_absolute=make_kdl_frame(bone.basis,bone.prev_joint,hand.is_left)
-            if num==0:
+            bone_absolute=make_kdl_frame(bone.basis,bone.prev_joint,marker_ns)
+            if boneName=="metacarpal":
                 bone_tf=relative_frame(hand_tf,bone_absolute)
             else:
                 bone_tf=relative_frame(prev_bone_absolute,bone_absolute)
 
-            bone_name=finger_name+"_"+bones_names[num]
+            bone_name=finger_name+"_"+boneName
             hand_dict[bone_name]=[prev_bone_name,bone_tf]
 
             # Markers for visualization
             marker_id = id_bones
             marker = create_marker(
                 bone_tf, marker_id, marker_ns, Marker.CYLINDER, 
-                scale=[20/1000, 20/1000, bone.length/1000], color=[0.0, 1.0, 0.0, 1.0], parent_frame=prev_bone_name
+                scale=[bone.msg.width/1000, bone.msg.width/1000, bone.msg.length/1000], color=[0.0, 1.0, 0.0, 1.0], parent_frame=prev_bone_name
             )
             marker_array.markers.append(marker)
             
@@ -111,7 +118,7 @@ def make_tf_marker_dict(hand, hand_name, marker_ns):
 
             
             
-        tip=PyKDL.Frame(PyKDL.Rotation(1,0,0, 0,1,0, 0,0,1),PyKDL.Vector(0,0,-bone.length/1000.0))
+        tip=PyKDL.Frame(PyKDL.Rotation(1,0,0, 0,1,0, 0,0,1),PyKDL.Vector(0,0,-bone.msg.length/1000))
         hand_dict[finger_name+"_tip"]=[prev_bone_name,tip]    
     return hand_dict, marker_array
      # now sending to ROS       
@@ -149,16 +156,16 @@ def sender():
 
     while not rospy.is_shutdown():
         timenow = rospy.Time.now()
-        if li.listener.left_hand:
+        if li.listener.frame.left_hand.msg.is_present: # Type Hand
             try:
-                broadcast_hand(li.listener.left_hand, "left_hand", timenow, marker_pub_left, br)
+                broadcast_hand(li.listener.frame.left_hand, "left_hand", timenow, marker_pub_left, br)
             except Exception as e:
                 rospy.logerr(f"Error in broadcast left: {e}")
                 return
             
-        if li.listener.right_hand:
+        if li.listener.frame.right_hand.msg.is_present: # Type Hand
             try:
-                broadcast_hand(li.listener.right_hand, "right_hand", timenow, marker_pub_right, br)
+                broadcast_hand(li.listener.frame.right_hand, "right_hand", timenow, marker_pub_right, br)
             except Exception as e:
                 rospy.logerr(f"Error in broadcast right: {e}")
                 return
