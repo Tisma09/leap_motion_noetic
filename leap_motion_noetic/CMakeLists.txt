@@ -14,7 +14,6 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   #camera_info_manager
   #camera_calibration_parsers 
-  message_generation
   geometry_msgs
   visualization_msgs
   std_msgs
@@ -69,7 +68,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
+# include
   ${catkin_INCLUDE_DIRS}
 )
 
