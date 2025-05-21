@@ -9,7 +9,7 @@ import leap_interface
 from std_msgs.msg import String
 
 FREQUENCY_ROSTOPIC_DEFAULT = 0.01
-NODENAME = 'leap_pub'
+NODENAME = 'leap_pub_node'
 PARAMNAME_FREQ = 'freq'
 PARAMNAME_FREQ_ENTIRE = '/' + NODENAME + '/' + PARAMNAME_FREQ
 

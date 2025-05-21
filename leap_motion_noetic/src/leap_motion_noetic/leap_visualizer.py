@@ -38,7 +38,7 @@ def relative_frame(frame_A,frame_B):
 class Visualizer:
     def __init__(self):
         # Initialize the ROS node
-        rospy.init_node('visu_ctrl_node', anonymous=True)
+        rospy.init_node('leap_visu_node', anonymous=True)
 
         # Subscriber
         self.sub_right_hand = rospy.Subscriber('leapmotion/right_hand', Hand, lambda msg: self.callback_hand(msg, "right_hand"))

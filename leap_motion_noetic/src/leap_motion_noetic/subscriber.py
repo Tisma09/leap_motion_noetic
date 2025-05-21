@@ -8,7 +8,7 @@ from geometry_msgs.msg import Vector3, Point
 class Subscriber:
     def __init__(self):
         # Initialize the ROS node
-        rospy.init_node('leap_sub', anonymous=True)
+        rospy.init_node('leap_sub_node', anonymous=True)
 
         # Subscriber
         self.sub_right_hand = rospy.Subscriber('leapmotion/right_hand', Hand, self.callback_hand)
