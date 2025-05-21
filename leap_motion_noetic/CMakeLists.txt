@@ -26,22 +26,22 @@ find_package(catkin REQUIRED COMPONENTS
 ################################################
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  Arm.msg
-  Bone.msg
-  Finger.msg
-  Frame.msg
-  Gesture.msg
-  Hand.msg
-)
+#add_message_files(
+#  FILES
+#  Arm.msg
+#  Bone.msg
+#  Finger.msg
+#  Frame.msg
+#  Gesture.msg
+#  Hand.msg
+#)
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  geometry_msgs
-  std_msgs
-)
+#generate_messages(
+#  DEPENDENCIES
+#  geometry_msgs
+#  std_msgs
+#)
 
 ###################################
 ## catkin specific configuration ##

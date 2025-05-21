@@ -9,7 +9,7 @@ import time
 import Leap
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 
-from leap_motion_noetic.msg import Frame, Finger, Bone, Hand, Arm, Gesture
+from leap_motion_msgs.msg import Frame, Finger, Bone, Hand, Arm, Gesture
 from geometry_msgs.msg import Vector3, Point
 from std_msgs.msg import Float64MultiArray
 

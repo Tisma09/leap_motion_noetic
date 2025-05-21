@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import rospy
-from leap_motion_noetic.msg import Frame, Finger, Bone, Hand, Arm, Gesture
+from leap_motion_msgs.msg import Hand
 from geometry_msgs.msg import Vector3, Point
 
 
