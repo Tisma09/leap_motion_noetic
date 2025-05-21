@@ -71,9 +71,13 @@ def sender():
     li.join()
 
 
-if __name__ == '__main__':
+def main():
     try:
         sender()
     except rospy.ROSInterruptException:
         pass
+
+
+if __name__ == '__main__':
+    main()
 
