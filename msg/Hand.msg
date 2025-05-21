@@ -16,6 +16,8 @@ float32 time_visible
 # The confidence level ranges between 0.0 and 1.0 inclusive.
 float32 confidence
 
+
+
 # The following three angles are in radians!
 float32 roll
 float32 pitch
@@ -34,6 +36,9 @@ float32 grab_strength
 # The distance between the thumb and index finger of a pinch hand pose. 
 float32 pinch_strength
 
+# The basis vectors of the hand, stored in a matrix.
+std_msgs/Float64MultiArray basis
+
 # The rate of change of the palm position in meters/second. 
 geometry_msgs/Vector3 palm_velocity
 
@@ -43,17 +48,21 @@ geometry_msgs/Point palm_center
 # The estimated width of the palm when the hand is in a flat position. 
 float32 palm_width
 
+
+
 # The radius (m) of a sphere fit to the curvature of this hand. 
 float32 sphere_radius
 
 # The center of a sphere fit to the curvature of this hand. 
 geometry_msgs/Point sphere_center
 
+
+
 # A string containing a brief, human readable description of the Hand object. 
 string to_string 
 
 # A list of fingers and gestures associated with this hand
-#Finger[] finger_list
+Finger[] finger_list
 
 # The arm associated with this hand
 #Arm arm

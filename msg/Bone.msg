@@ -12,6 +12,9 @@ float32 width
 # A string containing a brief, human readable description of the Bone object. 
 string to_string
 
+# The basis vectors of the bone, stored in a matrix.
+std_msgs/Float64MultiArray basis
+
 # The base of the bone, closest to the wrist. 
 geometry_msgs/Point bone_start
 

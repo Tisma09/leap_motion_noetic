@@ -67,6 +67,9 @@ def sender():
         
         rospy.sleep(rospy.get_param(PARAMNAME_FREQ_ENTIRE, FREQUENCY_ROSTOPIC_DEFAULT))
 
+    li.stop()
+    li.join()
+
 
 if __name__ == '__main__':
     try:

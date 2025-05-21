@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-__author__ = 'Igor Zubrycki, upadate by Tismo'
+__author__ = 'Igor Zubrycki, Tismo'
 
 import leap_interface
 

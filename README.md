@@ -1,10 +1,10 @@
 # ROS LEAP MOTION FOR NOETIC
 
-ROS driver for the Leap Motion Controller
+ROS driver for the Leap Motion Controller based on [leap_motion](https://github.com/ros-drivers/leap_motion) but has been almost completely rewritten to support Noetic and improve functionality.
 
 ## REQUIREMENTS
 
-This code is valid only for [ROS Noetic](http://wiki.ros.org/noetic). For previous ROS distributions, please refer to the original repository: [https://github.com/ros-drivers/leap_motion](https://github.com/ros-drivers/leap_motion).
+This code is valid only for [ROS Noetic](http://wiki.ros.org/noetic). For previous ROS distributions, please refer to the original repository: [leap_motion](https://github.com/ros-drivers/leap_motion).
 
 On ROS Noetic, the `libLeap` package is not compatible with `rocpp`. Therefore, this package uses a Python wrapper that has been recompiled with SWIG to ensure compatibility with Python 3.
 

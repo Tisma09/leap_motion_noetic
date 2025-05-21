@@ -5,13 +5,13 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /Status1
-        - /MarkerArray1
-        - /MarkerArray1/Status1
         - /MarkerArray1/Namespaces1
-        - /MarkerArray2
-        - /MarkerArray2/Status1
-      Splitter Ratio: 0.5
+        - /TF1/Tree1
+        - /TF1/Tree1/ground1/left_hand_ground1/left_hand1
+        - /TF1/Tree1/ground1/left_hand_ground1/left_hand1/left_hand_index_metacarpal1
+        - /TF1/Tree1/ground1/left_hand_ground1/left_hand1/left_hand_index_metacarpal1/left_hand_index_proximal1
+        - /TF1/Tree1/ground1/left_hand_ground1/left_hand1/left_hand_index_metacarpal1/left_hand_index_proximal1/left_hand_index_intermediate1
+      Splitter Ratio: 0.8852941393852234
     Tree Height: 549
   - Class: rviz/Selection
     Name: Selection
@@ -72,6 +72,197 @@ Visualization Manager:
         right_hand: true
       Queue Size: 50
       Value: true
+    - Class: rviz/TF
+      Enabled: true
+      Filter (blacklist): ""
+      Filter (whitelist): ""
+      Frame Timeout: 2
+      Frames:
+        All Enabled: false
+        ground:
+          Value: true
+        left_hand:
+          Value: true
+        left_hand_ground:
+          Value: false
+        left_hand_index_distal:
+          Value: false
+        left_hand_index_intermediate:
+          Value: false
+        left_hand_index_metacarpal:
+          Value: false
+        left_hand_index_proximal:
+          Value: false
+        left_hand_index_tip:
+          Value: false
+        left_hand_middle_distal:
+          Value: false
+        left_hand_middle_intermediate:
+          Value: false
+        left_hand_middle_metacarpal:
+          Value: false
+        left_hand_middle_proximal:
+          Value: false
+        left_hand_middle_tip:
+          Value: false
+        left_hand_pinky_distal:
+          Value: false
+        left_hand_pinky_intermediate:
+          Value: false
+        left_hand_pinky_metacarpal:
+          Value: false
+        left_hand_pinky_proximal:
+          Value: false
+        left_hand_pinky_tip:
+          Value: false
+        left_hand_ring_distal:
+          Value: false
+        left_hand_ring_intermediate:
+          Value: false
+        left_hand_ring_metacarpal:
+          Value: false
+        left_hand_ring_proximal:
+          Value: false
+        left_hand_ring_tip:
+          Value: false
+        left_hand_thumb_distal:
+          Value: false
+        left_hand_thumb_intermediate:
+          Value: false
+        left_hand_thumb_metacarpal:
+          Value: false
+        left_hand_thumb_proximal:
+          Value: false
+        left_hand_thumb_tip:
+          Value: false
+        right_hand:
+          Value: true
+        right_hand_ground:
+          Value: false
+        right_hand_index_distal:
+          Value: false
+        right_hand_index_intermediate:
+          Value: false
+        right_hand_index_metacarpal:
+          Value: false
+        right_hand_index_proximal:
+          Value: false
+        right_hand_index_tip:
+          Value: false
+        right_hand_middle_distal:
+          Value: false
+        right_hand_middle_intermediate:
+          Value: false
+        right_hand_middle_metacarpal:
+          Value: false
+        right_hand_middle_proximal:
+          Value: false
+        right_hand_middle_tip:
+          Value: false
+        right_hand_pinky_distal:
+          Value: false
+        right_hand_pinky_intermediate:
+          Value: false
+        right_hand_pinky_metacarpal:
+          Value: false
+        right_hand_pinky_proximal:
+          Value: false
+        right_hand_pinky_tip:
+          Value: false
+        right_hand_ring_distal:
+          Value: false
+        right_hand_ring_intermediate:
+          Value: false
+        right_hand_ring_metacarpal:
+          Value: false
+        right_hand_ring_proximal:
+          Value: false
+        right_hand_ring_tip:
+          Value: false
+        right_hand_thumb_distal:
+          Value: false
+        right_hand_thumb_intermediate:
+          Value: false
+        right_hand_thumb_metacarpal:
+          Value: false
+        right_hand_thumb_proximal:
+          Value: false
+        right_hand_thumb_tip:
+          Value: false
+      Marker Alpha: 1
+      Marker Scale: 0.5
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: false
+      Tree:
+        ground:
+          left_hand_ground:
+            left_hand:
+              left_hand_index_metacarpal:
+                left_hand_index_proximal:
+                  left_hand_index_intermediate:
+                    left_hand_index_distal:
+                      left_hand_index_tip:
+                        {}
+              left_hand_middle_metacarpal:
+                left_hand_middle_proximal:
+                  left_hand_middle_intermediate:
+                    left_hand_middle_distal:
+                      left_hand_middle_tip:
+                        {}
+              left_hand_pinky_metacarpal:
+                left_hand_pinky_proximal:
+                  left_hand_pinky_intermediate:
+                    left_hand_pinky_distal:
+                      left_hand_pinky_tip:
+                        {}
+              left_hand_ring_metacarpal:
+                left_hand_ring_proximal:
+                  left_hand_ring_intermediate:
+                    left_hand_ring_distal:
+                      left_hand_ring_tip:
+                        {}
+              left_hand_thumb_metacarpal:
+                left_hand_thumb_proximal:
+                  left_hand_thumb_intermediate:
+                    left_hand_thumb_distal:
+                      left_hand_thumb_tip:
+                        {}
+          right_hand_ground:
+            right_hand:
+              right_hand_index_metacarpal:
+                right_hand_index_proximal:
+                  right_hand_index_intermediate:
+                    right_hand_index_distal:
+                      right_hand_index_tip:
+                        {}
+              right_hand_middle_metacarpal:
+                right_hand_middle_proximal:
+                  right_hand_middle_intermediate:
+                    right_hand_middle_distal:
+                      right_hand_middle_tip:
+                        {}
+              right_hand_pinky_metacarpal:
+                right_hand_pinky_proximal:
+                  right_hand_pinky_intermediate:
+                    right_hand_pinky_distal:
+                      right_hand_pinky_tip:
+                        {}
+              right_hand_ring_metacarpal:
+                right_hand_ring_proximal:
+                  right_hand_ring_intermediate:
+                    right_hand_ring_distal:
+                      right_hand_ring_tip:
+                        {}
+              right_hand_thumb_metacarpal:
+                right_hand_thumb_proximal:
+                  right_hand_thumb_intermediate:
+                    right_hand_thumb_distal:
+                      right_hand_thumb_tip:
+                        {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -100,7 +291,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.6986929774284363
+      Distance: 1.0329971313476562
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -137,4 +328,4 @@ Window Geometry:
     collapsed: false
   Width: 1200
   X: 627
-  Y: 115
+  Y: 78

@@ -11,6 +11,7 @@ from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 
 from leap_motion_noetic.msg import Frame, Finger, Bone, Hand, Arm, Gesture
 from geometry_msgs.msg import Vector3, Point
+from std_msgs.msg import Float64MultiArray
 
 
 
@@ -26,6 +27,7 @@ class LeapBone():
         self.msg.type = 9
         self.msg.length = 0.0
         self.msg.width = 0.0
+        self.msg.basis = Float64MultiArray()
         self.msg.bone_start = Point(0,0,0)
         self.msg.bone_end = Point(0,0,0)
         self.msg.center = Point(0,0,0)
@@ -42,6 +44,7 @@ class LeapBone():
         self.msg.type = bone.type
         self.msg.width = bone.width
         self.msg.length = bone.length
+        self.msg.basis.data = bone.basis.to_array_3x3()
         self.msg.bone_start = Point(bone.prev_joint.x, bone.prev_joint.y, bone.prev_joint.z)
         self.msg.bone_end = Point(bone.next_joint.x, bone.next_joint.y, bone.next_joint.z)
         self.msg.center = Point(bone.center.x, bone.center.y, bone.center.z)
@@ -64,7 +67,7 @@ class LeapFinger():
         self.msg.width = 0.0
         self.msg.to_string = "Finger"
 
-        #self.msg.bone_list = [getattr(self, name).msg for name in self.boneNames]
+        self.msg.bone_list = [getattr(self, name).msg for name in self.boneNames]
                 
 
 
@@ -82,7 +85,7 @@ class LeapFinger():
         self.msg.length = finger.length
         self.msg.width = finger.width
 
-        #self.msg.bone_list = [getattr(self, name).msg for name in self.boneNames]
+        self.msg.bone_list = [getattr(self, name).msg for name in self.boneNames]
 
 
 
@@ -118,6 +121,7 @@ class LeapHand():
         self.msg.normal = Vector3(0,0,0)
         self.msg.grab_strength = 0.0
         self.msg.pinch_strength = 0.0
+        self.msg.basis = Float64MultiArray()
         self.msg.palm_velocity = Vector3(0,0,0)
         self.msg.palm_center = Point(0,0,0)
         self.msg.palm_width = 0.0
@@ -125,7 +129,7 @@ class LeapHand():
         self.msg.sphere_center = Point(0,0,0)
         self.msg.to_string = "Hand"
 
-        #self.msg.finger_list = [getattr(self, name).msg for name in self.fingerNames]
+        self.msg.finger_list = [getattr(self, name).msg for name in self.fingerNames]
         #self.msg.arm = self.arm.msg
 
 
@@ -153,13 +157,14 @@ class LeapHand():
         self.msg.normal = Vector3(hand.palm_normal.x, hand.palm_normal.y, hand.palm_normal.z)
         self.msg.grab_strength = hand.grab_strength
         self.msg.pinch_strength = hand.pinch_strength
+        self.msg.basis.data = hand.basis.to_array_3x3()
         self.msg.palm_velocity = Vector3(hand.palm_velocity.x, hand.palm_velocity.y, hand.palm_velocity.z)
         self.msg.palm_center = Point(hand.palm_position.x, hand.palm_position.y, hand.palm_position.z)
         self.msg.palm_width = hand.palm_width
         self.msg.sphere_radius = hand.sphere_radius
         self.msg.sphere_center = Point(hand.sphere_center.x, hand.sphere_center.y, hand.sphere_center.z)
         
-        #self.msg.finger_list = [getattr(self, name).msg for name in self.fingerNames]
+        self.msg.finger_list = [getattr(self, name).msg for name in self.fingerNames]
         #self.msg.arm = self.arm.msg
 
 
@@ -302,15 +307,17 @@ class Runner(threading.Thread):
     def __init__(self,arg=None):
         threading.Thread.__init__(self)
         self.arg=arg
+        self.running = True
         self.listener = LeapInterface()
         self.controller = Leap.Controller()
         self.controller.add_listener(self.listener)
 
-    def __del__(self):
+    def stop(self):
+        self.running = False
         self.controller.remove_listener(self.listener)
 
     def run (self):
-        while True:
+        while self.running :
             # Save some CPU time
             time.sleep(0.001)
 
