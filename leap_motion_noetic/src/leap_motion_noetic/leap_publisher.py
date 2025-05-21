@@ -4,7 +4,8 @@ import sys
 import select
 import termios
 import tty
-import leap_interface
+
+import leap_motion_noetic.leap_interface as leap_interface
 
 from std_msgs.msg import String
 
