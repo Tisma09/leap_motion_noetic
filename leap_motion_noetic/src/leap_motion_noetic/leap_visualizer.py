@@ -6,7 +6,7 @@ import rospy
 import tf
 import PyKDL
 
-from leap_motion_noetic.msg import Hand
+from leap_motion_msgs.msg import Hand
 from visualization_msgs.msg import Marker, MarkerArray
 
 finger_names=["thumb","index","middle","ring","pinky"]

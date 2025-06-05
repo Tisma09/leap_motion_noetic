@@ -1,8 +1,10 @@
 <launch>
-    <!-- Start publisher -->
-    <node pkg="leap_motion_noetic" 
-        type="leap_publisher_node.py" 
-        name="leap_publisher_node" 
-        output="screen" 
-        launch-prefix="bash -c 'LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(find leap_motion_noetic)/LeapSDK/lib PYTHONPATH=$PYTHONPATH:$(find leap_motion_noetic)/LeapSDK/lib exec python3 $(find leap_motion_noetic)/scripts/leap_publisher_node.py'"/>
+  <!-- Start publisher -->
+  <node pkg="leap_motion_noetic"
+        type="leap_publisher_node.py"
+        name="leap_publisher_node"
+        output="screen">
+    <env name="LD_LIBRARY_PATH" value="$(env LD_LIBRARY_PATH):$(find leap_motion_noetic)/LeapSDK/lib"/>
+    <env name="PYTHONPATH" value="$(env PYTHONPATH):$(find leap_motion_noetic)/LeapSDK/lib"/>
+  </node>
 </launch>

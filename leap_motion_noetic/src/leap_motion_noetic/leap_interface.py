@@ -214,6 +214,11 @@ class LeapFrame():
 
         #self.msg.right_hand = self.right_hand.msg
         #self.msg.left_hand = self.right_hand.msg
+        
+        #print("Height : " + str(_frame.interaction_box.height))
+        #print("Width : " + str(_frame.interaction_box.width))
+        #print("Depth : " + str(_frame.interaction_box.depth))
+        #print("Center : " + str(_frame.interaction_box.center))
 
 
     def gesture_type(self, controller):
