@@ -4,6 +4,7 @@
 # SDK folder, e.g., $HOME/LeapSDK/lib where the Leap.py lives and /LeapSDK/lib/x64 or
 # x86 where the *.so files reside.
 
+import rospy
 import threading
 import time
 import Leap
@@ -215,10 +216,10 @@ class LeapFrame():
         #self.msg.right_hand = self.right_hand.msg
         #self.msg.left_hand = self.right_hand.msg
         
-        #print("Height : " + str(_frame.interaction_box.height))
-        #print("Width : " + str(_frame.interaction_box.width))
-        #print("Depth : " + str(_frame.interaction_box.depth))
-        #print("Center : " + str(_frame.interaction_box.center))
+        #rospy.loginfo("Height : " + str(_frame.interaction_box.height))
+        #rospy.loginfo("Width : " + str(_frame.interaction_box.width))
+        #rospy.loginfo("Depth : " + str(_frame.interaction_box.depth))
+        #rospy.loginfo("Center : " + str(_frame.interaction_box.center))
 
 
     def gesture_type(self, controller):
@@ -239,25 +240,25 @@ class LeapFrame():
                     previous_update = CircleGesture(controller.frame(1).gesture(circle.id))
                     swept_angle =  (circle.progress - previous_update.progress) * 2 * Leap.PI
 
-                print("Circle id: %d, %s, progress: %f, radius: %f, angle: %f degrees, %s" % (
+                rospy.loginfo("Circle id: %d, %s, progress: %f, radius: %f, angle: %f degrees, %s" % (
                         gesture.id, self.state_string(gesture.state),
                         circle.progress, circle.radius, swept_angle * Leap.RAD_TO_DEG, clockwiseness))
 
             if gesture.type == Leap.Gesture.TYPE_SWIPE:
                 swipe = SwipeGesture(gesture)
-                print("Swipe id: %d, state: %s, position: %s, direction: %s, speed: %f" % (
+                rospy.loginfo("Swipe id: %d, state: %s, position: %s, direction: %s, speed: %f" % (
                         gesture.id, self.state_string(gesture.state),
                         swipe.position, swipe.direction, swipe.speed))
 
             if gesture.type == Leap.Gesture.TYPE_KEY_TAP:
                 keytap = KeyTapGesture(gesture)
-                print("Key Tap id: %d, %s, position: %s, direction: %s" % (
+                rospy.loginfo("Key Tap id: %d, %s, position: %s, direction: %s" % (
                         gesture.id, self.state_string(gesture.state),
                         keytap.position, keytap.direction ))
 
             if gesture.type == Leap.Gesture.TYPE_SCREEN_TAP:
                 screentap = ScreenTapGesture(gesture)
-                print("Screen Tap id: %d, %s, position: %s, direction: %s" % (
+                rospy.loginfo("Screen Tap id: %d, %s, position: %s, direction: %s" % (
                         gesture.id, self.state_string(gesture.state),
                         screentap.position, screentap.direction ))
 
@@ -284,10 +285,10 @@ class LeapFrame():
 class LeapInterface(Leap.Listener):
     def on_init(self, controller):
         self.frame = LeapFrame()
-        print("Initialized Leap Motion Device")
+        rospy.loginfo("\nInitialized Leap Motion Device ")
 
     def on_connect(self, controller):
-        print("Connected to Leap Motion Controller")
+        rospy.loginfo("Connected to Leap Motion Controller")
 
         # Enable gestures
         controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE);
@@ -296,10 +297,10 @@ class LeapInterface(Leap.Listener):
         controller.enable_gesture(Leap.Gesture.TYPE_SWIPE);
 
     def on_disconnect(self, controller):
-        print("Disconnected Leap Motion")
+        rospy.loginfo("Disconnected Leap Motion")
 
     def on_exit(self, controller):
-        print("Exited Leap Motion Controller")
+        rospy.loginfo("Exited Leap Motion Controller")
 
     def on_frame(self, controller):
         # Get the most recent frame and report some basic information

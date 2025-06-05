@@ -7,4 +7,9 @@
     <env name="LD_LIBRARY_PATH" value="$(env LD_LIBRARY_PATH):$(find leap_motion_noetic)/LeapSDK/lib"/>
     <env name="PYTHONPATH" value="$(env PYTHONPATH):$(find leap_motion_noetic)/LeapSDK/lib"/>
   </node>
+  <node pkg="leap_motion_noetic"
+        type="key_publisher_node.py"
+        name="key_publisher_node"
+        output="screen">
+  </node>
 </launch>

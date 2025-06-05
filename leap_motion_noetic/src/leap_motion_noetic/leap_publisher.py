@@ -15,19 +15,6 @@ PARAMNAME_FREQ_ENTIRE = '/' + NODENAME + '/' + PARAMNAME_FREQ
 
 
 
-def get_key():
-    tty.setraw(sys.stdin.fileno()) 
-    rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
-    if rlist:
-        key = sys.stdin.read(1)
-    else:
-        key = ''
-    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
-    return key
-
-
-
-
 def sender():
     '''
     This method publishes the data of leap
@@ -45,7 +32,6 @@ def sender():
     pub_human = rospy.Publisher('leapmotion/frame', leap_interface.Frame, queue_size=1)
     pub_right_hand = rospy.Publisher('leapmotion/right_hand', leap_interface.Hand, queue_size=1)
     pub_left_hand = rospy.Publisher('leapmotion/left_hand', leap_interface.Hand, queue_size=1)
-    #pub_key = rospy.Publisher('keyboard/key_pressed', String, queue_size=1)
 
     rate = rospy.Rate(rospy.get_param(PARAMNAME_FREQ_ENTIRE, FREQUENCY_ROSTOPIC_DEFAULT))
 
@@ -55,15 +41,6 @@ def sender():
         pub_right_hand.publish(li.listener.frame.right_hand.msg)
         pub_left_hand.publish(li.listener.frame.left_hand.msg)
 
-        """"
-        key = get_key()
-        if key == '\x03':  # Ctrl-C
-            break
-        elif key :
-            rospy.loginfo("Key pressed !")
-            pub_key.publish(key)
-        """
-        
         rate.sleep()
 
     li.stop()
