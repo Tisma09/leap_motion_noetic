@@ -20,8 +20,8 @@ string to_string
 
 # If there were any hands detected in the frame then the 
 # hand.msg will be added here
-#Hand right_hand
-#Hand left_hand
+Hand right_hand
+Hand left_hand
 
-#Gesture[] gesture_list
+Gesture[] gesture_list
 

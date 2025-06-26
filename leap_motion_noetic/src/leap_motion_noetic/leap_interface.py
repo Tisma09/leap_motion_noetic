@@ -9,6 +9,7 @@ import threading
 import time
 import Leap
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
+from math import pi
 
 from leap_motion_msgs.msg import Frame, Finger, Bone, Hand, Arm, Gesture
 from geometry_msgs.msg import Vector3, Point
@@ -59,13 +60,13 @@ class LeapFinger():
         self.boneNames = ['metacarpal', 'proximal', 'intermediate', 'distal']
         for boneName in self.boneNames:
             setattr(self, boneName, LeapBone())
-        self.tip = [0.0, 0.0, 0.0]
 
         self.msg = Finger()
         self.msg.lmc_finger_id = 9999
         self.msg.type = 9
         self.msg.length = 0.0
         self.msg.width = 0.0
+        self.msg.tip = Point(0,0,0)
         self.msg.to_string = "Finger"
 
         self.msg.bone_list = [getattr(self, name).msg for name in self.boneNames]
@@ -77,14 +78,15 @@ class LeapFinger():
             # Get the base of each bone
             bone = finger.bone(getattr(Leap.Bone, 'TYPE_%s' % boneName.upper()))
             getattr(self, boneName).update(bone)
+            
         # For the tip, get the end of the distal bone
-        self.tip = finger.bone(Leap.Bone.TYPE_DISTAL).next_joint.to_float_array()
-
+        tip = finger.bone(Leap.Bone.TYPE_DISTAL).next_joint.to_float_array()
 
         self.msg.lmc_finger_id = finger.id
         self.msg.type = finger.type
         self.msg.length = finger.length
         self.msg.width = finger.width
+        self.msg.tip = Point(tip[0],tip[1],tip[2])
 
         self.msg.bone_list = [getattr(self, name).msg for name in self.boneNames]
 
@@ -189,8 +191,10 @@ class LeapFrame():
         self.msg.nr_of_gestures = 0
         self.msg.current_frames_per_second = 0.0
         self.msg.to_string = "Frame"
+        self.msg.gesture_list = None
         #self.msg.right_hand = self.right_hand.msg
         #self.msg.left_hand = self.right_hand.msg
+        
 
     def update(self, controller):
         _frame = controller.frame() # Local Object
@@ -212,9 +216,11 @@ class LeapFrame():
         self.msg.nr_of_hands = len(_frame.hands)
         self.msg.nr_of_gestures = len(_frame.gestures())
         self.msg.current_frames_per_second = _frame.current_frames_per_second
+        
+        self.msg.gesture_list = self.gesture_msg(controller)
 
-        #self.msg.right_hand = self.right_hand.msg
-        #self.msg.left_hand = self.right_hand.msg
+        self.msg.right_hand = self.right_hand.msg
+        self.msg.left_hand = self.left_hand.msg
         
         #rospy.loginfo("Height : " + str(_frame.interaction_box.height))
         #rospy.loginfo("Width : " + str(_frame.interaction_box.width))
@@ -222,9 +228,40 @@ class LeapFrame():
         #rospy.loginfo("Center : " + str(_frame.interaction_box.center))
 
 
-    def gesture_type(self, controller):
+    def gesture_msg(self, controller):
+        gesture_list = []
+    
         # Gestures
-        for gesture in self.gestures():
+        for gesture in self.gestures:
+            if gesture.type == Leap.Gesture.TYPE_CIRCLE:
+                gesture_form = CircleGesture(gesture)
+            elif gesture.type == Leap.Gesture.TYPE_SWIPE:
+                gesture_form = SwipeGesture(gesture)
+            elif gesture.type == Leap.Gesture.TYPE_KEY_TAP:
+                gesture_form = KeyTapGesture(gesture)
+            elif gesture.type == Leap.Gesture.TYPE_SCREEN_TAP:
+                gesture_form = ScreenTapGesture(gesture)
+            else :
+                continue
+                
+            gesture_msg = Gesture()
+            gesture_msg.is_valid = gesture.is_valid
+            gesture_msg.duration_us = gesture.duration
+            gesture_msg.duration_s = gesture.duration_seconds
+            gesture_msg.gesture_state = gesture.state
+            gesture_msg.gesture_type = gesture.type
+            gesture_msg.to_string = "Gesture"
+            gesture_msg.is_right_hand = gesture_form.pointable.hand.is_right
+            gesture_msg.is_left_hand = gesture_form.pointable.hand.is_left
+            gesture_msg.finger_type = Leap.Finger(gesture_form.pointable).type 
+            
+            gesture_msg.circle_progress = gesture_form.progress if gesture.type == Leap.Gesture.TYPE_CIRCLE else 0.0
+            
+            gesture_list.append(gesture_msg)
+        
+        return gesture_list
+        
+        """
             if gesture.type == Leap.Gesture.TYPE_CIRCLE:
                 circle = CircleGesture(gesture)
 
@@ -243,6 +280,8 @@ class LeapFrame():
                 rospy.loginfo("Circle id: %d, %s, progress: %f, radius: %f, angle: %f degrees, %s" % (
                         gesture.id, self.state_string(gesture.state),
                         circle.progress, circle.radius, swept_angle * Leap.RAD_TO_DEG, clockwiseness))
+                
+        
 
             if gesture.type == Leap.Gesture.TYPE_SWIPE:
                 swipe = SwipeGesture(gesture)
@@ -261,9 +300,10 @@ class LeapFrame():
                 rospy.loginfo("Screen Tap id: %d, %s, position: %s, direction: %s" % (
                         gesture.id, self.state_string(gesture.state),
                         screentap.position, screentap.direction ))
+        """
 
 
-    def state_string(state):
+    def state_string(self, state):
         if state == Leap.Gesture.STATE_START:
             return "STATE_START"
 
@@ -292,9 +332,24 @@ class LeapInterface(Leap.Listener):
 
         # Enable gestures
         controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE);
-        controller.enable_gesture(Leap.Gesture.TYPE_KEY_TAP);
-        controller.enable_gesture(Leap.Gesture.TYPE_SCREEN_TAP);
-        controller.enable_gesture(Leap.Gesture.TYPE_SWIPE);
+        #controller.enable_gesture(Leap.Gesture.TYPE_KEY_TAP);
+        #controller.enable_gesture(Leap.Gesture.TYPE_SCREEN_TAP);
+        #controller.enable_gesture(Leap.Gesture.TYPE_SWIPE);
+        
+        controller.config.set("Gesture.Circle.MinRadius", 20.0)
+        controller.config.set("Gesture.Circle.MinArc", 2*pi)
+        """
+        controller.config.set("Gesture.Swipe.MinLength", 150.0)
+        controller.config.set("Gesture.Swipe.MinVelocity", 1000)
+        controller.config.set("Gesture.KeyTap.MinDownVelocity", 50.0)
+        controller.config.set("Gesture.KeyTap.HistorySeconds", .1)
+        controller.config.set("Gesture.KeyTap.MinDistance", 3.0)
+        controller.config.set("Gesture.ScreenTap.MinForwardVelocity", 50.0)
+        controller.config.set("Gesture.ScreenTap.HistorySeconds", .1)
+        controller.config.set("Gesture.ScreenTap.MinDistance", 5.0)
+        """
+        controller.config.save()
+        
 
     def on_disconnect(self, controller):
         rospy.loginfo("Disconnected Leap Motion")

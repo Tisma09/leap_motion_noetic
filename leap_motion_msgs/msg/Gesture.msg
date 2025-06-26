@@ -30,6 +30,26 @@ int32 gesture_type
 # A string containing a brief, human-readable description of this Gesture. 
 string to_string
 
+
+
+
+# If the hand associated to the gesture is the right
+bool is_right_hand
+
+# If the hand associated to the gesture is the left
+bool is_left_hand
+
+# The type of finger that is associated to the gesture
+int32 finger_type
+
+
+
+# The progress of the gesture for circle gestures
+float32 circle_progress
+
+
+
+
 # The list of fingers, tools ids associated with this Gesture, if any. 
-int32[] pointable_ids
+#int32[] pointable_ids
 

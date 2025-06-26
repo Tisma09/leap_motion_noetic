@@ -15,5 +15,8 @@ float32 width
 # A string containing a brief, human readable description of the Finger object. 
 string to_string
 
+# The position of the tipe of the finger
+geometry_msgs/Point tip
+
 # List of bones associated with this finger
 Bone[] bone_list

@@ -30,16 +30,16 @@ def sender():
     settings = termios.tcgetattr(sys.stdin)
 
     pub_human = rospy.Publisher('leapmotion/frame', leap_interface.Frame, queue_size=1)
-    pub_right_hand = rospy.Publisher('leapmotion/right_hand', leap_interface.Hand, queue_size=1)
-    pub_left_hand = rospy.Publisher('leapmotion/left_hand', leap_interface.Hand, queue_size=1)
+    #pub_right_hand = rospy.Publisher('leapmotion/right_hand', leap_interface.Hand, queue_size=1)
+    #pub_left_hand = rospy.Publisher('leapmotion/left_hand', leap_interface.Hand, queue_size=1)
 
     rate = rospy.Rate(rospy.get_param(PARAMNAME_FREQ_ENTIRE, FREQUENCY_ROSTOPIC_DEFAULT))
 
     while not rospy.is_shutdown():
 
         pub_human.publish(li.listener.frame.msg)
-        pub_right_hand.publish(li.listener.frame.right_hand.msg)
-        pub_left_hand.publish(li.listener.frame.left_hand.msg)
+        #pub_right_hand.publish(li.listener.frame.right_hand.msg)
+        #pub_left_hand.publish(li.listener.frame.left_hand.msg)
 
         rate.sleep()
 

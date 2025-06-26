@@ -6,7 +6,7 @@ import rospy
 import tf
 import PyKDL
 
-from leap_motion_msgs.msg import Hand
+from leap_motion_msgs.msg import Frame, Hand
 from visualization_msgs.msg import Marker, MarkerArray
 
 finger_names=["thumb","index","middle","ring","pinky"]
@@ -41,8 +41,10 @@ class Visualizer:
         rospy.init_node('leap_visu_node', anonymous=True)
 
         # Subscriber
-        self.sub_right_hand = rospy.Subscriber('leapmotion/right_hand', Hand, lambda msg: self.callback_hand(msg, "right_hand"))
-        self.sub_left_hand = rospy.Subscriber('leapmotion/left_hand', Hand, lambda msg: self.callback_hand(msg, "left_hand"))
+        self.sub_left_hand = rospy.Subscriber('leapmotion/frame', Frame, self.callback_frame, queue_size=1)
+
+        #self.sub_right_hand = rospy.Subscriber('leapmotion/right_hand', Hand, lambda msg: self.callback_hand(msg, "right_hand"), queue_size=1)
+        #self.sub_left_hand = rospy.Subscriber('leapmotion/left_hand', Hand, lambda msg: self.callback_hand(msg, "left_hand"), queue_size=1)
 
         # Publisher
         self.marker_pub_left = rospy.Publisher('leapmotion/markers_left', MarkerArray, queue_size=1)
@@ -52,7 +54,9 @@ class Visualizer:
         self.br = tf.TransformBroadcaster()
 
         
-
+    def callback_frame(self, frame):
+        self.callback_hand(frame.right_hand, "right_hand")
+        self.callback_hand(frame.left_hand, "left_hand")
 
     def callback_hand(self, hand, hand_name):
         timenow = rospy.Time.now()
