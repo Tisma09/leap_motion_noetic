@@ -55,10 +55,11 @@ sudo service leapd restart
 source ~/catkin_ws/devel/setup.bash
 ```
 
-**5.** Launch the demo.launch file to see if you have set everything up correctly. If you wish to enable a lowpass filter change "enable_filter" to true in filter_params.yaml file.
+**5.** Launch the visualizer_data.launch file to see if you have set everything up correctly. 
 
 ```bash
-roslaunch leap_motion skeleton_visu.launch
+roslaunch leap_motion visualizer_data.launch
 ```
 
 **6.** You are done! You should see an RViz window opening up displaying the detected hands from the controller.
+
